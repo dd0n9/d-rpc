@@ -19,7 +19,7 @@ public class VertxHttpServer implements HttpServer{
             request
                     .response()
                     .putHeader("content-type", "text/plain")
-                    .end("Hello World");
+                    .end("Hello World From Vert.x");
         });
 
         httpServer.listen(port, result -> {
