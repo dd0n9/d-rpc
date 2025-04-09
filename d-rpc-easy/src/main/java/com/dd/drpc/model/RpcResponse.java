@@ -1,7 +1,19 @@
 package com.dd.drpc.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.io.Serializable;
 
+/**
+ * RPC响应
+ */
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class RpcResponse implements Serializable {
 
     /**
