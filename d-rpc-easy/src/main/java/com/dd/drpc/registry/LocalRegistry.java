@@ -31,6 +31,10 @@ public class LocalRegistry {
         return map.get(serviceName);
     }
 
+    /**
+     * 移除服务
+     * @param serviceName
+     */
     public static void remove(String serviceName) {
         map.remove(serviceName);
     }

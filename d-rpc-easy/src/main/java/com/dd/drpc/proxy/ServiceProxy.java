@@ -32,7 +32,7 @@ public class ServiceProxy implements InvocationHandler {
                     .execute()) {
                 byte[] result = httpResponse.bodyBytes();
                 RpcResponse rpcResponse = serializer.deserialize(result, RpcResponse.class);
-                return rpcResponse;
+                return rpcResponse.getData();
             }
         } catch (Exception e) {
             e.printStackTrace();

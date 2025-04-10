@@ -15,7 +15,7 @@ public class EasyConsumerExample {
         user.setName("d0n9");
         User newUser = userService.getUser(user);
         if (newUser != null) {
-            System.out.println(newUser.getName());
+            System.out.println("username:" + newUser.getName());
         } else {
             System.out.println("user not found");
         }

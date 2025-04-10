@@ -35,7 +35,7 @@ public class HttpServerHandler implements Handler<HttpServerRequest> {
             }
 
             RpcResponse rpcResponse = new RpcResponse();
-            if (rpcRequest != null) {
+            if (rpcRequest == null) {
                 rpcResponse.setMessage("rpcRequest is null");
                 doResponse(httpServerRequest, rpcResponse, serializer);
                 return;
