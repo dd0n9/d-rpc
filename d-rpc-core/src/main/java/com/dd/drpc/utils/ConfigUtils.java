@@ -8,7 +8,7 @@ import cn.hutool.setting.dialect.Props;
  */
 public class ConfigUtils {
     public static <T> T loadConfig(Class<T> clazz, String prefix) {
-        return loadConfig(clazz, prefix);
+        return loadConfig(clazz, prefix, "");
     }
     public static <T> T loadConfig(Class<T> clazz, String prefix, String environment) {
         StringBuilder stringBuilder = new StringBuilder("application");
