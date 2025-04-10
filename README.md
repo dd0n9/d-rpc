@@ -1,7 +1,7 @@
 # d-rpc
 my firtst wheel project: handwrting RPC
 
-## What d-rpc can do?
+## What can d-rpc do?
 ### a simple rpc (4/10/2025)
 - a web server bulit by Vert.x frame.
 - a local rigistry
