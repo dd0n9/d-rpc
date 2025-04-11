@@ -20,7 +20,7 @@ public class RpcApplication {
      */
     public static void init(RpcConfig newrpcConfig) {
         rpcConfig = newrpcConfig;
-        log.info("Rpc init, config={}" + newrpcConfig.toString());
+        log.info("Rpc init, config={}",newrpcConfig.toString());
     }
 
     /**
