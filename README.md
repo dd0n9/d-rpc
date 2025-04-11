@@ -32,4 +32,7 @@ my firtst wheel project: handwrting RPC
   - will be more...
 - an application to init configration
   - support customized configration
-  - use Double-Checked Locking Singleton Pattern to ensure thread safety and avoid unnecessary overhead 
+  - use Double-Checked Locking Singleton Pattern to ensure thread safety and avoid unnecessary overhead
+- will be more...
+  - 配置文件路径的灵活性：允许用户指定配置文件的路径，而不是固定为application.properties
+  - 缓存配置：如果配置文件不经常变化，可以考虑缓存加载的配置，避免每次调用都重新加载文件。
