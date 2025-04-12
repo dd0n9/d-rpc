@@ -3,7 +3,7 @@ package com.dd.drpc.server;
 import com.dd.drpc.model.RpcRequest;
 import com.dd.drpc.model.RpcResponse;
 import com.dd.drpc.registry.LocalRegistry;
-import com.dd.drpc.serializer.JdkSerializaer;
+import com.dd.drpc.serializer.JdkSerializer;
 import com.dd.drpc.serializer.Serializer;
 import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
@@ -20,7 +20,7 @@ public class HttpServerHandler implements Handler<HttpServerRequest> {
     public void handle(HttpServerRequest httpServerRequest) {
         // 反序列化请求为对象，并从请求对象中获取参数。
         // 确定序列化器
-        final Serializer serializer = new JdkSerializaer();
+        final Serializer serializer = new JdkSerializer();
         //日志记录
         System.out.println("Recived request: " + httpServerRequest.method() + " " + httpServerRequest.uri());
 

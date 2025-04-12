@@ -8,7 +8,7 @@ import java.io.ObjectOutputStream;
 /**
  * 序列化器实现
  */
-public class JdkSerializaer implements Serializer {
+public class JdkSerializer implements Serializer {
     /**
      * 序列化
      * @param obj

@@ -16,10 +16,11 @@ public interface Serializer {
 
     /**
      * 反序列化
+     *
      * @param data
      * @param clazz
-     * @return
      * @param <T>
+     * @return
      * @throws Exception
      */
     <T> T deserialize(byte[] data, Class<T> clazz) throws Exception;

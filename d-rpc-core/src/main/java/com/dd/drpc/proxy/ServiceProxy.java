@@ -4,7 +4,7 @@ import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import com.dd.drpc.model.RpcRequest;
 import com.dd.drpc.model.RpcResponse;
-import com.dd.drpc.serializer.JdkSerializaer;
+import com.dd.drpc.serializer.JdkSerializer;
 import com.dd.drpc.serializer.Serializer;
 
 import java.lang.reflect.InvocationHandler;
@@ -16,7 +16,7 @@ import java.lang.reflect.Method;
 public class ServiceProxy implements InvocationHandler {
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        Serializer serializer = new JdkSerializaer();
+        Serializer serializer = new JdkSerializer();
 
         RpcRequest rpcRequest = RpcRequest.builder()
                 .serviceName(method.getDeclaringClass().getName())
