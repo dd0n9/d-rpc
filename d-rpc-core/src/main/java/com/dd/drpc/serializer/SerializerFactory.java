@@ -1,5 +1,6 @@
 package com.dd.drpc.serializer;
 
+import com.dd.drpc.spi.SpiLoader;
 import com.fasterxml.jackson.databind.JsonSerializer;
 
 import java.util.HashMap;
@@ -12,21 +13,16 @@ public class SerializerFactory {
     /**
      * 序列化器映射
      */
-    private static final Map<String, Serializer> SERIALIZER_MAP = new HashMap<String, Serializer>() {
-        {
-            put(SerializerKeys.JDK, new JdkSerializer());
-            put(SerializerKeys.JSON, new JSONSerializer());
-            put(SerializerKeys.KRYO, new KryoSerializer());
-            put(SerializerKeys.HESSIAN, new HessianSerializer());
+    static {
+            SpiLoader.load(Serializer.class);
         }
-    };
 
     /**
      * 默认序列化器
      */
-    private static final Serializer DEFAULT_SERIALIZER = SERIALIZER_MAP.get("jdk");
+    private static final Serializer DEFAULT_SERIALIZER = new JdkSerializer();
 
     public static Serializer getSerializer(String type) {
-        return SERIALIZER_MAP.getOrDefault(type, DEFAULT_SERIALIZER);
+        return SpiLoader.getInstance(Serializer.class, type);
     }
 }
