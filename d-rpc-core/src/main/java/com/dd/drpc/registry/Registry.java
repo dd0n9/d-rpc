@@ -1,7 +1,7 @@
 package com.dd.drpc.registry;
 
 import com.dd.drpc.config.RegistryConfig;
-import com.dd.drpc.model.ServiceMateInfo;
+import com.dd.drpc.model.ServiceMetaInfo;
 
 import java.util.List;
 
@@ -18,22 +18,22 @@ public interface Registry {
 
     /**
      * 服务提供端注册
-     * @param serviceMateInfo
+     * @param serviceMetaInfo
      */
-    void register(ServiceMateInfo serviceMateInfo) throws Exception;
+    void register(ServiceMetaInfo serviceMetaInfo) throws Exception;
 
     /**
      * 注销服务
-     * @param serviceMateInfo
+     * @param serviceMetaInfo
      */
-    void unregister(ServiceMateInfo serviceMateInfo);
+    void unregister(ServiceMetaInfo serviceMetaInfo);
 
     /**
      * 消费者端发现服务
      * @param servicekey
      * @return
      */
-    List<ServiceMateInfo> serviceDiscovery(String servicekey);
+    List<ServiceMetaInfo> serviceDiscovery(String servicekey);
 
     /**
      * 服务销毁

@@ -2,17 +2,14 @@ package com.dd.drpc.registry;
 
 import cn.hutool.json.JSONUtil;
 import com.dd.drpc.config.RegistryConfig;
-import com.dd.drpc.model.ServiceMateInfo;
+import com.dd.drpc.model.ServiceMetaInfo;
 import io.etcd.jetcd.*;
-import io.etcd.jetcd.kv.GetResponse;
 import io.etcd.jetcd.options.GetOption;
 import io.etcd.jetcd.options.PutOption;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 /**
@@ -42,20 +39,20 @@ public class EtcdRegistry implements Registry{
 
     /**
      * 注册服务
-     * @param serviceMateInfo
+     * @param serviceMetaInfo
      * @throws Exception
      */
     @Override
-    public void register(ServiceMateInfo serviceMateInfo) throws Exception {
+    public void register(ServiceMetaInfo serviceMetaInfo) throws Exception {
         Lease leaseClient = client.getLeaseClient();
 
         // 租约
         long leaseId = leaseClient.grant(30).get().getID();
 
         // 设置键值对
-        String registerKey = ETCD_ROOT_PATH + serviceMateInfo.getServiceNodeKey();
+        String registerKey = ETCD_ROOT_PATH + serviceMetaInfo.getServiceNodeKey();
         ByteSequence key = ByteSequence.from(registerKey, StandardCharsets.UTF_8);
-        ByteSequence value = ByteSequence.from(JSONUtil.toJsonStr(serviceMateInfo), StandardCharsets.UTF_8);
+        ByteSequence value = ByteSequence.from(JSONUtil.toJsonStr(serviceMetaInfo), StandardCharsets.UTF_8);
 
         // 键值对租约关联
         PutOption putOption = PutOption.builder().withLeaseId(leaseId).build();
@@ -64,11 +61,11 @@ public class EtcdRegistry implements Registry{
 
     /**
      * 注销服务
-     * @param serviceMateInfo
+     * @param serviceMetaInfo
      */
     @Override
-    public void unregister(ServiceMateInfo serviceMateInfo) {
-        String registerKey = ETCD_ROOT_PATH + serviceMateInfo.getServiceNodeKey();
+    public void unregister(ServiceMetaInfo serviceMetaInfo) {
+        String registerKey = ETCD_ROOT_PATH + serviceMetaInfo.getServiceNodeKey();
         ByteSequence key = ByteSequence.from(registerKey, StandardCharsets.UTF_8);
         kvClient.delete(key);
     }
@@ -79,9 +76,9 @@ public class EtcdRegistry implements Registry{
      * @return
      */
     @Override
-    public List<ServiceMateInfo> serviceDiscovery(String servicekey) {
+    public List<ServiceMetaInfo> serviceDiscovery(String servicekey) {
         // 搜索前缀
-        String searchPrefix = ETCD_ROOT_PATH + servicekey + "/";
+        String searchPrefix = ETCD_ROOT_PATH + servicekey;
 
         // 前缀查询
         GetOption getOption = GetOption.builder().isPrefix(true).build();
@@ -94,7 +91,7 @@ public class EtcdRegistry implements Registry{
             return keyValues.stream()
                     .map(keyValue -> {
                         String value = keyValue.getValue().toString(StandardCharsets.UTF_8);
-                        return JSONUtil.toBean(value, ServiceMateInfo.class);
+                        return JSONUtil.toBean(value, ServiceMetaInfo.class);
                     })
                     .collect(Collectors.toList());
         } catch (Exception e) {
