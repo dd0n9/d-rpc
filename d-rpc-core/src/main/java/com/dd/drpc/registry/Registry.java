@@ -26,7 +26,7 @@ public interface Registry {
      * 注销服务
      * @param serviceMetaInfo
      */
-    void unregister(ServiceMetaInfo serviceMetaInfo);
+    void unRegister(ServiceMetaInfo serviceMetaInfo);
 
     /**
      * 消费者端发现服务

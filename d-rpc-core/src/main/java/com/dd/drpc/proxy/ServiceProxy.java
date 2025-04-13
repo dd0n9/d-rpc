@@ -41,6 +41,8 @@ public class ServiceProxy implements InvocationHandler {
             ServiceMetaInfo serviceMetaInfo = new ServiceMetaInfo();
             serviceMetaInfo.setServiceName(serviceName);
             serviceMetaInfo.setServiceVersion(RpcConstant.DEAFAULT_SERVICE_VERSION);
+            serviceMetaInfo.setServiceHost(rpcConfig.getHost());
+            serviceMetaInfo.setServicePort(rpcConfig.getPort());
             List<ServiceMetaInfo> serviceMetaInfos = registry.serviceDiscovery(serviceMetaInfo.getServiceKey());
             if (CollUtil.isEmpty(serviceMetaInfos)) {
                 throw new RuntimeException("无服务地址");

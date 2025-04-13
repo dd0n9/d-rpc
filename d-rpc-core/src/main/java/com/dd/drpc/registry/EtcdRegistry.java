@@ -47,7 +47,7 @@ public class EtcdRegistry implements Registry{
         Lease leaseClient = client.getLeaseClient();
 
         // 租约
-        long leaseId = leaseClient.grant(30).get().getID();
+        long leaseId = leaseClient.grant(100).get().getID();
 
         // 设置键值对
         String registerKey = ETCD_ROOT_PATH + serviceMetaInfo.getServiceNodeKey();
@@ -64,7 +64,7 @@ public class EtcdRegistry implements Registry{
      * @param serviceMetaInfo
      */
     @Override
-    public void unregister(ServiceMetaInfo serviceMetaInfo) {
+    public void unRegister(ServiceMetaInfo serviceMetaInfo) {
         String registerKey = ETCD_ROOT_PATH + serviceMetaInfo.getServiceNodeKey();
         ByteSequence key = ByteSequence.from(registerKey, StandardCharsets.UTF_8);
         kvClient.delete(key);
@@ -78,7 +78,7 @@ public class EtcdRegistry implements Registry{
     @Override
     public List<ServiceMetaInfo> serviceDiscovery(String servicekey) {
         // 搜索前缀
-        String searchPrefix = ETCD_ROOT_PATH + servicekey;
+        String searchPrefix = ETCD_ROOT_PATH + servicekey + "/";
 
         // 前缀查询
         GetOption getOption = GetOption.builder().isPrefix(true).build();

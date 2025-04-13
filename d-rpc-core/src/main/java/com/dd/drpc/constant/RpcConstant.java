@@ -11,8 +11,8 @@ public interface RpcConstant {
     String DEAFAULT_CONFIG_PREFIX = "rpc";
 
     /**
-     * 默认配置版本
+     * 默认服务版本
      */
-    String DEAFAULT_SERVICE_VERSION = "1.0";
+    String DEAFAULT_SERVICE_VERSION = "2.0.0";
 
 }
