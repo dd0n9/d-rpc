@@ -20,7 +20,7 @@ public interface Registry {
      * 服务提供端注册
      * @param serviceMateInfo
      */
-    void register(ServiceMateInfo serviceMateInfo);
+    void register(ServiceMateInfo serviceMateInfo) throws Exception;
 
     /**
      * 注销服务

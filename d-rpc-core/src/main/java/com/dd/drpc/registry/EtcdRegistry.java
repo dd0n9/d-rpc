@@ -1,39 +1,119 @@
 package com.dd.drpc.registry;
 
-import io.etcd.jetcd.ByteSequence;
-import io.etcd.jetcd.Client;
-import io.etcd.jetcd.KV;
+import cn.hutool.json.JSONUtil;
+import com.dd.drpc.config.RegistryConfig;
+import com.dd.drpc.model.ServiceMateInfo;
+import io.etcd.jetcd.*;
 import io.etcd.jetcd.kv.GetResponse;
+import io.etcd.jetcd.options.GetOption;
+import io.etcd.jetcd.options.PutOption;
 
+import java.nio.charset.StandardCharsets;
+import java.time.Duration;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 /**
  * Etcd注册中心
  */
-public class EtcdRegistry {
-    public static void main(String[] args) throws ExecutionException, InterruptedException {
-        // 创建客户端
-        System.out.println("creating etcd registry...");
-        System.out.println("creating etcd clinet...");
-        Client client = Client.builder().endpoints("http://localhost:2379").build();
+public class EtcdRegistry implements Registry{
 
-        System.out.println("creating kvClinet...");
-        KV kvClient = client.getKVClient();
-        ByteSequence key = ByteSequence.from("test_key".getBytes());
-        ByteSequence value = ByteSequence.from("test_value".getBytes());
+    Client client;
+    KV kvClient;
 
-        System.out.println("putting key-value...");
-        kvClient.put(key, value).get();
+    /**
+     * 根节点
+     */
+    private static final String ETCD_ROOT_PATH = "/rpc/";
 
-        CompletableFuture<GetResponse> getFuture = kvClient.get(key);
-        System.out.println("getting value...");
-        GetResponse getResponse = getFuture.get();
-        System.out.println(getResponse.toString());
-
-        System.out.println("deleting key-value...");
-        kvClient.delete(key).get();
-
+    /**
+     * 初始化
+     * @param registryConfig
+     */
+    @Override
+    public void init(RegistryConfig registryConfig) {
+        client = Client.builder().endpoints(registryConfig.getAddress())
+                .connectTimeout(Duration.ofMillis(registryConfig.getTimeout()))
+                .build();
+        kvClient = client.getKVClient();
     }
 
+    /**
+     * 注册服务
+     * @param serviceMateInfo
+     * @throws Exception
+     */
+    @Override
+    public void register(ServiceMateInfo serviceMateInfo) throws Exception {
+        Lease leaseClient = client.getLeaseClient();
+
+        // 租约
+        long leaseId = leaseClient.grant(30).get().getID();
+
+        // 设置键值对
+        String registerKey = ETCD_ROOT_PATH + serviceMateInfo.getServiceNodeKey();
+        ByteSequence key = ByteSequence.from(registerKey, StandardCharsets.UTF_8);
+        ByteSequence value = ByteSequence.from(JSONUtil.toJsonStr(serviceMateInfo), StandardCharsets.UTF_8);
+
+        // 键值对租约关联
+        PutOption putOption = PutOption.builder().withLeaseId(leaseId).build();
+        kvClient.put(key, value, putOption).get();
+    }
+
+    /**
+     * 注销服务
+     * @param serviceMateInfo
+     */
+    @Override
+    public void unregister(ServiceMateInfo serviceMateInfo) {
+        String registerKey = ETCD_ROOT_PATH + serviceMateInfo.getServiceNodeKey();
+        ByteSequence key = ByteSequence.from(registerKey, StandardCharsets.UTF_8);
+        kvClient.delete(key);
+    }
+
+    /**
+     * 服务发现
+     * @param servicekey
+     * @return
+     */
+    @Override
+    public List<ServiceMateInfo> serviceDiscovery(String servicekey) {
+        // 搜索前缀
+        String searchPrefix = ETCD_ROOT_PATH + servicekey + "/";
+
+        // 前缀查询
+        GetOption getOption = GetOption.builder().isPrefix(true).build();
+        try {
+            List<KeyValue> keyValues = kvClient.get(
+                            ByteSequence.from(searchPrefix, StandardCharsets.UTF_8),
+                            getOption)
+                    .get()
+                    .getKvs();
+            return keyValues.stream()
+                    .map(keyValue -> {
+                        String value = keyValue.getValue().toString(StandardCharsets.UTF_8);
+                        return JSONUtil.toBean(value, ServiceMateInfo.class);
+                    })
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * 销毁服务
+     */
+    @Override
+    public void destroy() {
+        System.out.println("节点下线");
+        // 资源释放
+        if (kvClient != null) {
+            kvClient.close();
+        }
+        if (client != null) {
+            client.close();
+        }
+    }
 }

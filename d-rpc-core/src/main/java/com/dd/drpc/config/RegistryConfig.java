@@ -1,8 +1,11 @@
 package com.dd.drpc.config;
 
+import lombok.Data;
+
 /**
  * 注册中心配置
  */
+@Data
 public class RegistryConfig {
 
     /**

@@ -1,8 +1,11 @@
 package com.dd.drpc.model;
 
+import lombok.Data;
+
 /**
  * 服务注册信息
  */
+@Data
 public class ServiceMateInfo {
 
     /**
