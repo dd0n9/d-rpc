@@ -13,6 +13,6 @@ public interface RpcConstant {
     /**
      * 默认配置版本
      */
-    String DEAFAULT_CONFIG_VERSION = "1.0";
+    String DEAFAULT_SERVICE_VERSION = "1.0";
 
 }

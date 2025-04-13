@@ -29,7 +29,7 @@ public class RpcRequest implements Serializable {
     /**
      * 服务版本号
      */
-    private String serviceVersion = RpcConstant.DEAFAULT_CONFIG_VERSION;
+    private String serviceVersion = RpcConstant.DEAFAULT_SERVICE_VERSION;
 
     /**
      * 参数类型列表
