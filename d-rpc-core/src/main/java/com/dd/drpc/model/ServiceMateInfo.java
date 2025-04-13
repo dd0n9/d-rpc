@@ -3,7 +3,7 @@ package com.dd.drpc.model;
 /**
  * 服务注册信息
  */
-public class SeriviceMateInfo {
+public class ServiceMateInfo {
 
     /**
      * 服务名称
