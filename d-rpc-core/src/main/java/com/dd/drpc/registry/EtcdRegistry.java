@@ -1,5 +1,8 @@
 package com.dd.drpc.registry;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.cron.CronUtil;
+import cn.hutool.cron.task.Task;
 import cn.hutool.json.JSONUtil;
 import com.dd.drpc.config.RegistryConfig;
 import com.dd.drpc.model.ServiceMetaInfo;
@@ -9,13 +12,21 @@ import io.etcd.jetcd.options.PutOption;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 /**
  * Etcd注册中心
  */
 public class EtcdRegistry implements Registry{
+
+    /**
+     * 注册节点集合
+     */
+    private final Set<String> LocalRegistedNodeKeysSet = new HashSet<>();
 
     Client client;
     KV kvClient;
@@ -35,6 +46,7 @@ public class EtcdRegistry implements Registry{
                 .connectTimeout(Duration.ofMillis(registryConfig.getTimeout()))
                 .build();
         kvClient = client.getKVClient();
+        heartBeat();
     }
 
     /**
@@ -47,7 +59,7 @@ public class EtcdRegistry implements Registry{
         Lease leaseClient = client.getLeaseClient();
 
         // 租约
-        long leaseId = leaseClient.grant(100).get().getID();
+        long leaseId = leaseClient.grant(30).get().getID();
 
         // 设置键值对
         String registerKey = ETCD_ROOT_PATH + serviceMetaInfo.getServiceNodeKey();
@@ -57,6 +69,7 @@ public class EtcdRegistry implements Registry{
         // 键值对租约关联
         PutOption putOption = PutOption.builder().withLeaseId(leaseId).build();
         kvClient.put(key, value, putOption).get();
+        LocalRegistedNodeKeysSet.add(registerKey);
     }
 
     /**
@@ -68,6 +81,7 @@ public class EtcdRegistry implements Registry{
         String registerKey = ETCD_ROOT_PATH + serviceMetaInfo.getServiceNodeKey();
         ByteSequence key = ByteSequence.from(registerKey, StandardCharsets.UTF_8);
         kvClient.delete(key);
+        LocalRegistedNodeKeysSet.remove(registerKey);
     }
 
     /**
@@ -112,5 +126,37 @@ public class EtcdRegistry implements Registry{
         if (client != null) {
             client.close();
         }
+    }
+
+    /**
+     * 心跳检测
+     */
+    @Override
+    public void heartBeat() {
+        CronUtil.schedule("*/10 * * * * *", new Task() {
+            @Override
+            public void execute() {
+                for (String key : LocalRegistedNodeKeysSet) {
+                    try {
+                        List<KeyValue> keyValues = kvClient.get(ByteSequence.from(key, StandardCharsets.UTF_8))
+                                .get()
+                                .getKvs();
+                        // 节点过期
+                        if (CollUtil.isEmpty(keyValues)) {
+                            continue;
+                        }
+                        // 没过期则续签
+                        KeyValue keyValue = keyValues.get(0);
+                        String value = keyValue.getValue().toString(StandardCharsets.UTF_8);
+                        ServiceMetaInfo serviceMetaInfo = JSONUtil.toBean(value, ServiceMetaInfo.class);
+                        register(serviceMetaInfo);
+                    } catch (Exception e) {
+                        throw new RuntimeException(key + "续签失败", e);
+                    }
+                }
+            }
+        });
+        CronUtil.setMatchSecond(true);
+        CronUtil.start();
     }
 }
