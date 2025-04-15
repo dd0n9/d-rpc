@@ -26,7 +26,7 @@ public class EtcdRegistry implements Registry{
     /**
      * 注册节点集合
      */
-    private final Set<String> LocalRegistedNodeKeysSet = new HashSet<>();
+    private final Set<String> localRegistedNodeKeysSet = new HashSet<>();
 
     Client client;
     KV kvClient;
@@ -69,7 +69,7 @@ public class EtcdRegistry implements Registry{
         // 键值对租约关联
         PutOption putOption = PutOption.builder().withLeaseId(leaseId).build();
         kvClient.put(key, value, putOption).get();
-        LocalRegistedNodeKeysSet.add(registerKey);
+        localRegistedNodeKeysSet.add(registerKey);
     }
 
     /**
@@ -81,7 +81,7 @@ public class EtcdRegistry implements Registry{
         String registerKey = ETCD_ROOT_PATH + serviceMetaInfo.getServiceNodeKey();
         ByteSequence key = ByteSequence.from(registerKey, StandardCharsets.UTF_8);
         kvClient.delete(key);
-        LocalRegistedNodeKeysSet.remove(registerKey);
+        localRegistedNodeKeysSet.remove(registerKey);
     }
 
     /**
@@ -119,6 +119,13 @@ public class EtcdRegistry implements Registry{
     @Override
     public void destroy() {
         System.out.println("节点下线");
+        for (String key : localRegistedNodeKeysSet) {
+            try {
+                kvClient.delete(ByteSequence.from(key, StandardCharsets.UTF_8)).get();
+            }catch (Exception e) {
+                throw new RuntimeException("节点下线失败", e);
+            }
+        }
         // 资源释放
         if (kvClient != null) {
             kvClient.close();
@@ -136,7 +143,7 @@ public class EtcdRegistry implements Registry{
         CronUtil.schedule("*/10 * * * * *", new Task() {
             @Override
             public void execute() {
-                for (String key : LocalRegistedNodeKeysSet) {
+                for (String key : localRegistedNodeKeysSet) {
                     try {
                         List<KeyValue> keyValues = kvClient.get(ByteSequence.from(key, StandardCharsets.UTF_8))
                                 .get()
