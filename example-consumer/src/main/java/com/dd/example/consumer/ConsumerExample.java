@@ -24,9 +24,19 @@ public class ConsumerExample {
         } else {
             System.out.println("user not found");
         }
+        User newUser1 = userService.getUser(user);
+        if (newUser != null) {
+            System.out.println("username:" + newUser1.getName());
+        } else {
+            System.out.println("user not found");
+        }
+        User newUser2 = userService.getUser(user);
+        if (newUser != null) {
+            System.out.println("username:" + newUser2.getName());
+        } else {
+            System.out.println("user not found");
+        }
 
-        int num = userService.getNumber();
-        System.out.println(num);
 
     }
 }
