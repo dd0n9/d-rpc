@@ -18,6 +18,7 @@ public class RoundRobinLoadBalancer implements LoadBalancer {
 
     @Override
     public ServiceMetaInfo select(Map<String, Object> requestParam, List<ServiceMetaInfo> serviceMetaInfoList) {
+        System.out.println("RoundRobinLoadBalancer select...");
         if (serviceMetaInfoList.isEmpty()) {
             return null;
         }

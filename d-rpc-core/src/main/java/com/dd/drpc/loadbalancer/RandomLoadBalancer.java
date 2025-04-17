@@ -18,6 +18,7 @@ public class RandomLoadBalancer implements LoadBalancer {
 
     @Override
     public ServiceMetaInfo select(Map<String, Object> requestParam, List<ServiceMetaInfo> serviceMetaInfoList) {
+        System.out.println("RandomLoadBalancer select...");
         int size = serviceMetaInfoList.size();
         if (size == 0) {
             return null;
