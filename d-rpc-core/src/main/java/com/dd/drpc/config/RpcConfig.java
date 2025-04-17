@@ -1,5 +1,6 @@
 package com.dd.drpc.config;
 
+import com.dd.drpc.loadbalancer.LoadBalancerKeys;
 import com.dd.drpc.serializer.SerializerKeys;
 import lombok.Data;
 
@@ -43,4 +44,9 @@ public class RpcConfig {
      * 注册中心
      */
     private RegistryConfig registryConfig = new RegistryConfig();
+
+    /**
+     * 负载均衡器
+     */
+    private String loadbalance = LoadBalancerKeys.ROUND_ROBIN;
 }
