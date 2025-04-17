@@ -29,7 +29,7 @@ public class ProviderExample {
         ServiceMetaInfo serviceMetaInfo = new ServiceMetaInfo();
         serviceMetaInfo.setServiceName(serviceName);
         serviceMetaInfo.setServiceHost(rpcConfig.getHost());
-        serviceMetaInfo.setServicePort(rpcConfig.getPort());
+        serviceMetaInfo.setServicePort(8088);
         serviceMetaInfo.setServiceVersion(rpcConfig.getVersion());
         try {
             registry.register(serviceMetaInfo);

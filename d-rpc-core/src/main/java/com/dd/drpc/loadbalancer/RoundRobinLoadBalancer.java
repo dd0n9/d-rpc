@@ -29,6 +29,8 @@ public class RoundRobinLoadBalancer implements LoadBalancer {
         }
 
         int index = currentIndex.getAndIncrement() % size;
-        return serviceMetaInfoList.get(index);
+        ServiceMetaInfo serviceMetaInfo = serviceMetaInfoList.get(index);
+        System.out.println("RoundRobinLoadBalancer selected serviceMetaInfo: " + serviceMetaInfo);
+        return serviceMetaInfo;
     }
 }

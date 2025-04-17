@@ -39,7 +39,9 @@ public class ConsistentHashLoadBalancer implements LoadBalancer {
         if (entry == null) {
             entry = virtualNodes.firstEntry();
         }
-        return entry.getValue();
+        ServiceMetaInfo value = entry.getValue();
+        System.out.println("ConsistentHashLoadBalancer select. hash=" + hash + " value=" + value);
+        return value;
 
     }
 
