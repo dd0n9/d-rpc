@@ -6,6 +6,8 @@ import cn.hutool.http.HttpResponse;
 import com.dd.drpc.RpcApplication;
 import com.dd.drpc.config.RpcConfig;
 import com.dd.drpc.constant.RpcConstant;
+import com.dd.drpc.loadbalancer.LoadBalancer;
+import com.dd.drpc.loadbalancer.LoadBalancerFactory;
 import com.dd.drpc.model.RpcRequest;
 import com.dd.drpc.model.RpcResponse;
 import com.dd.drpc.model.ServiceMetaInfo;
@@ -16,7 +18,9 @@ import com.dd.drpc.serializer.SerializerFactory;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 服务代理 (动态代理)
@@ -24,6 +28,7 @@ import java.util.List;
 public class ServiceProxy implements InvocationHandler {
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        // 选择序列化器
         Serializer serializer = SerializerFactory.getSerializer(RpcApplication.getRpcConfig().getSerializer());
 
         String serviceName = method.getDeclaringClass().getName();
@@ -37,6 +42,7 @@ public class ServiceProxy implements InvocationHandler {
             byte[] serialize = serializer.serialize(rpcRequest);
 
             RpcConfig rpcConfig = RpcApplication.getRpcConfig();
+            // 选择注册中心
             Registry registry = RegistryFactory.getRegistry(rpcConfig.getRegistryConfig().getRegistry());
             ServiceMetaInfo serviceMetaInfo = new ServiceMetaInfo();
             serviceMetaInfo.setServiceName(serviceName);
@@ -47,9 +53,15 @@ public class ServiceProxy implements InvocationHandler {
             if (CollUtil.isEmpty(serviceMetaInfos)) {
                 throw new RuntimeException("无服务地址");
             }
-            ServiceMetaInfo metaInfo = serviceMetaInfos.get(0);
 
-            try (HttpResponse httpResponse = HttpRequest.post(metaInfo.getServiceAddress())
+            // 负载均衡选用服务
+            LoadBalancer loadBalancer = LoadBalancerFactory.getLoadBalancer(rpcConfig.getLoadbalancer());
+            Map<String, Object> requestParams = new HashMap<>();
+            requestParams.put("methodName", rpcRequest.getMethodName());
+            ServiceMetaInfo selectedServiceMetaInfo = loadBalancer.select(requestParams, serviceMetaInfos);
+
+
+            try (HttpResponse httpResponse = HttpRequest.post(selectedServiceMetaInfo.getServiceAddress())
                     .body(serialize)
                     .execute()) {
                 byte[] result = httpResponse.bodyBytes();

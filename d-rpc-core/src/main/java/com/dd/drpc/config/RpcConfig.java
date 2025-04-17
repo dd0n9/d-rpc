@@ -48,5 +48,5 @@ public class RpcConfig {
     /**
      * 负载均衡器
      */
-    private String loadbalance = LoadBalancerKeys.ROUND_ROBIN;
+    private String loadbalancer = LoadBalancerKeys.ROUND_ROBIN;
 }
