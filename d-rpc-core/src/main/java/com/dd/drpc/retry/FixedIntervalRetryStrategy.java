@@ -16,6 +16,7 @@ public class FixedIntervalRetryStrategy implements RetryStrategy {
 
     @Override
     public RpcResponse doRetry(Callable<RpcResponse> callable) throws Exception {
+        System.out.println("执行固定时间间隔重试策略...");
         Retryer<RpcResponse> retryer = RetryerBuilder.<RpcResponse>newBuilder()
                 .retryIfExceptionOfType(Exception.class)
                 .withWaitStrategy(WaitStrategies.fixedWait(3L, TimeUnit.SECONDS))
