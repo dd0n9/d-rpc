@@ -1,5 +1,6 @@
 package com.dd.drpc.retry;
 
+import cn.hutool.http.HttpResponse;
 import com.dd.drpc.model.RpcRequest;
 import com.dd.drpc.model.RpcResponse;
 
@@ -16,5 +17,5 @@ public interface RetryStrategy {
      * @return
      * @throws Exception
      */
-    RpcResponse doRetry(Callable<RpcResponse> callable) throws Exception;
+    HttpResponse doRetry(Callable<HttpResponse> callable) throws Exception;
 }

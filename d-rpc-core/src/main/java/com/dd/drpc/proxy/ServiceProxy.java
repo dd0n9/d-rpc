@@ -13,6 +13,8 @@ import com.dd.drpc.model.RpcResponse;
 import com.dd.drpc.model.ServiceMetaInfo;
 import com.dd.drpc.registry.Registry;
 import com.dd.drpc.registry.RegistryFactory;
+import com.dd.drpc.retry.RetryStrategy;
+import com.dd.drpc.retry.RetryStrategyFactory;
 import com.dd.drpc.serializer.Serializer;
 import com.dd.drpc.serializer.SerializerFactory;
 
@@ -61,9 +63,13 @@ public class ServiceProxy implements InvocationHandler {
             ServiceMetaInfo selectedServiceMetaInfo = loadBalancer.select(requestParams, serviceMetaInfos);
 
 
-            try (HttpResponse httpResponse = HttpRequest.post(selectedServiceMetaInfo.getServiceAddress())
-                    .body(serialize)
-                    .execute()) {
+            // 选择重试策略
+            RetryStrategy retryStrategy = RetryStrategyFactory.getRetryStrategy(rpcConfig.getRetryStrategy());
+            try (HttpResponse httpResponse = retryStrategy.doRetry(() ->
+                HttpRequest.post(selectedServiceMetaInfo.getServiceAddress())
+                        .body(serialize)
+                        .execute()
+            )) {
                 byte[] result = httpResponse.bodyBytes();
                 RpcResponse rpcResponse = serializer.deserialize(result, RpcResponse.class);
                 return rpcResponse.getData();

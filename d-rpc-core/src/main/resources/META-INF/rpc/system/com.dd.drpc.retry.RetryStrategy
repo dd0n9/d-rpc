@@ -1,2 +1,2 @@
 no=com.dd.drpc.retry.NoRetryStrategy
-fixedInterval=com.dd.drpc.retry=FixedIntervalRetryStrategy
+fixedInterval=com.dd.drpc.retry.FixedIntervalRetryStrategy

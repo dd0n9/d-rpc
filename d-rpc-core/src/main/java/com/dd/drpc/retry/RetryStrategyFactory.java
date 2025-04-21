@@ -18,7 +18,7 @@ public class RetryStrategyFactory {
      * @param key
      * @return
      */
-    public static RetryStrategy getDefaultRetryStrategy(String key) {
+    public static RetryStrategy getRetryStrategy(String key) {
         return SpiLoader.getInstance(RetryStrategy.class, key);
     }
 }
