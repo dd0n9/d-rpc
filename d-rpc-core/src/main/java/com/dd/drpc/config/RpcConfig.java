@@ -3,6 +3,7 @@ package com.dd.drpc.config;
 import com.dd.drpc.loadbalancer.LoadBalancerKeys;
 import com.dd.drpc.retry.RetryStrategyKeys;
 import com.dd.drpc.serializer.SerializerKeys;
+import com.dd.drpc.tolerant.TolerantStrategyKeys;
 import lombok.Data;
 
 /**
@@ -55,4 +56,9 @@ public class RpcConfig {
      * 重试策略
      */
     private String retryStrategy = RetryStrategyKeys.FIXED_INTERVAL;
+
+    /**
+     * 容错机制
+     */
+    private String tolerantStrategy = TolerantStrategyKeys.FAIL_FAST;
 }
