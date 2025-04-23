@@ -4,10 +4,18 @@ import com.dd.drpc.constant.RpcConstant;
 import com.dd.drpc.loadbalancer.LoadBalancerKeys;
 import com.dd.drpc.retry.RetryStrategyKeys;
 import com.dd.drpc.tolerant.TolerantStrategyKeys;
+import org.springframework.stereotype.Component;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * 服务消费者注解
  */
+@Target(ElementType.FIELD)
+@Retention(RetentionPolicy.RUNTIME)
 public @interface DRpcReference {
 
     /**
