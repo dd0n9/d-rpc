@@ -19,6 +19,7 @@
         <module name="example-provider" />
         <module name="example-common" />
         <module name="example-consumer" />
+        <module name="d-rpc-spring-boot-starter" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel target="17" />
