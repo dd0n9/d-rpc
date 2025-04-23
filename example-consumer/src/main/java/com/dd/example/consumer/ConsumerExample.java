@@ -1,5 +1,6 @@
 package com.dd.example.consumer;
 
+import com.dd.drpc.bootstrap.ConsumerBootstrap;
 import com.dd.drpc.config.RpcConfig;
 import com.dd.drpc.proxy.ProxyFactory;
 import com.dd.drpc.utils.ConfigUtils;
@@ -11,8 +12,8 @@ import com.dd.example.common.service.UserService;
  */
 public class ConsumerExample {
     public static void main(String[] args) {
-        RpcConfig rpc = ConfigUtils.loadConfig(RpcConfig.class, "rpc");
-        System.out.println(rpc);
+
+        ConsumerBootstrap.init();
 
         // 获取实例对象
         UserService userService = ProxyFactory.getProxy(UserService.class);
